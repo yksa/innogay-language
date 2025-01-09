@@ -13,6 +13,9 @@ class Converter {
   }
 
   convert(input) {
+    if (!this.isMyanmarUnicode(input)) {
+      return "Not Myanmar unicode";
+    }
     const segmenter = new Intl.Segmenter("my", { granularity: "word" });
     const segments = [...segmenter.segment(input)].map(
       (segment) => segment.segment
