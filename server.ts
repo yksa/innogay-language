@@ -35,10 +35,12 @@ const getYayCha = ({
 // Define another GET endpoint
 router.get("/convert-to-gay", (context) => {
   const key = context.request.url.searchParams.get("key"); // Access query parameter
+  // filter space from start and end
+  const trimmedStr = key?.trim();
 
-  if (key && isMyanmarUnicode(key)) {
+  if (trimmedStr && isMyanmarUnicode(trimmedStr)) {
     const segmenter = new Intl.Segmenter("my", { granularity: "word" });
-    const segments = [...segmenter.segment(key)].map(
+    const segments = [...segmenter.segment(trimmedStr)].map(
       (segment) => segment.segment
     );
 
