@@ -1,5 +1,7 @@
 // server.ts
 import { Application, Router } from "https://deno.land/x/oak/mod.ts";
+import { transformCompoundWord } from "./utils/converter.ts";
+import { getMyanmarWords, isMyanmarUnicode } from "./utils/myanmarUtils.ts";
 
 // Create a new Oak application
 const app = new Application();
@@ -12,26 +14,6 @@ router.get("/", (context) => {
   context.response.body = { message: "Hello from Deno API server!" };
 });
 
-const reservedKey1 = ["ခ", "ဂ", "ပ", "ဖ", "ဝ", "ဒ"];
-
-const isMyanmarUnicode = (text: string): boolean => {
-  const myanmarUnicodeRegex = /^[\u1000-\u109F]+$/; // Regex to match Myanmar Unicode characters
-  return myanmarUnicodeRegex.test(text);
-};
-
-const getYayCha = ({
-  text,
-  secondText,
-}: {
-  text: string;
-  secondText: string;
-}) => {
-  if (["ျ", "ြ"].includes(secondText)) {
-    return "ာ";
-  }
-  return reservedKey1.includes(text) ? "ါ" : "ာ";
-};
-
 // Define another GET endpoint
 router.get("/convert-to-gay", (context) => {
   const key = context.request.url.searchParams.get("key"); // Access query parameter
@@ -39,38 +21,7 @@ router.get("/convert-to-gay", (context) => {
   const trimmedStr = key?.trim();
 
   if (trimmedStr && isMyanmarUnicode(trimmedStr)) {
-    const segmenter = new Intl.Segmenter("my", { granularity: "word" });
-    const segments = [...segmenter.segment(trimmedStr)].map(
-      (segment) => segment.segment
-    );
-
-    const transformFirstCharacter = (word: string) => {
-      const isKaGyi = word[0] === "က";
-      const yayCha = getYayCha({ text: word[0], secondText: word[1] });
-      const middleKey = `ေ${yayCha}်${isKaGyi ? "သ" : "က"}`;
-      if (isKaGyi) {
-        if (["ျ", "ြ", "ှ"].includes(word[1])) {
-          return `${word[0]}${word[1]}${middleKey}${word.slice(2)}`;
-        }
-        return `${word[0]}${middleKey}${word.slice(1)}`;
-      }
-
-      if (["ျ", "ြ", "ှ"].includes(word[1])) {
-        return `${word[0]}${word[1]}${middleKey}${word.slice(2)}`;
-      }
-
-      return `${word[0]}${middleKey}${word.slice(1)}`;
-    };
-
-    const transformCompoundWord = (word: string) => {
-      if (word === "ဝတ်ရည်") {
-        const result1 = transformFirstCharacter("ဝတ်");
-        const result2 = transformFirstCharacter("ရည်");
-        return result1 + result2;
-      } else {
-        return transformFirstCharacter(word);
-      }
-    };
+    const segments = getMyanmarWords(trimmedStr);
 
     const convertedArrays = segments.map((element) => {
       return transformCompoundWord(element);
