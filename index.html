@@ -18,17 +18,25 @@
         padding-right: 16px;
         cursor: pointer;
       }
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+      }
     </style>
   </head>
   <body>
     <div style="text-align: center">
       <h1>innogay converter v 0.0.2</h1>
-      <select name="type" id="select">
-        <option value="to-kaw">to gay</option>
-        <option value="from-kaw">from gay</option>
-      </select>
-      <input type="text" id="input" />
-      <button id="copy">copy</button>
+      <div class="container">
+        <select name="type" id="select">
+          <option value="to-kaw">to gay</option>
+          <option value="from-kaw">from gay</option>
+        </select>
+        <input type="text" id="input" />
+        <button id="copy">copy</button>
+      </div>
       <p id="output"></p>
       <br />
       <p id="response" style="color: green"></p>
